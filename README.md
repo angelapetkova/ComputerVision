@@ -9,6 +9,8 @@ This project implements a multi-task deep learning model that simultaneously per
 ### Repo usage
 On this repo, we contained the code as per Exam Regulations in [Project_final.ipynb](./Project_final.ipynb). The version we used while making the project is contained in [Our_Version_Project.ipynb](./Our_Version_Project.ipynb), which is included for completeness. 
 
+The presentation on this project is found in [sapienza-ppt-template.pptx](./sapienza-ppt-template.pptx).
+
 The data for the different best performing models are stored in this Google Drive folder [Data](https://drive.google.com/drive/folders/1V2w7TgXophqy8M25EfkI74P_m5vnj7Y8?usp=sharing), and [here](https://drive.google.com/file/d/1hPvCAM5HTZ5TdTp-3ubiBYpZIaXN_kxR/view?usp=sharing) the zip for the image dataset itself can be found.
 Nevertheless, we following the instructions specified here and in the Project_final notebook should suffice to reproduce our findings.
 
