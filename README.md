@@ -7,10 +7,12 @@ AI-generated image detectors are usually trained and evaluated on pristine, unmo
 This project implements a multi-task deep learning model that simultaneously performs two forensic tasks on a single input image: (1) classifying it as real or AI-generated, and (2) identifying which post-processing transformation (original, internet-transmitted, or re-digitalized) was applied.
 
 ### Repo usage
-On this repo, we contained the code as per Exam Regulations in 
+On this repo, we contained the code as per Exam Regulations in [Project_final.ipynb](./Project_final.ipynb). The version we used while making the project is contained in [Our_Version_Project.ipynb](./Our_Version_Project.ipynb), which is included for completeness. 
 
-## Definitions
-1. Data Preparation
+The data for the different best performing models are stored in this Google Drive folder [Data](https://drive.google.com/drive/folders/1V2w7TgXophqy8M25EfkI74P_m5vnj7Y8?usp=sharing), and [here](https://drive.google.com/file/d/1hPvCAM5HTZ5TdTp-3ubiBYpZIaXN_kxR/view?usp=sharing) the zip for the image dataset itself can be found.
+Nevertheless, we following the instructions specified here and in the Project_final notebook should suffice to reproduce our findings.
+
+## Data Preparation
 
 Trained on Google Colab's free tier (NVIDIA Tesla T4, 15GB VRAM, 12.7GB RAM, 113GB disk).
 Subset of ~18,000 images (~1.7MB each, ~30.6GB total) selected to fit within Colab's storage while leaving room for checkpoints, logs, and cache.
@@ -18,7 +20,7 @@ Family grouping: Images sharing the same source ID (different processed versions
 Final split: 80% train / 10% validation / 10% test, performed at the family level.
 We managed to define two global variables, setting the to resize_image_size = 380 and fixing global_batch_size = 16.
 
-2. Model Architecture
+## Model Architecture
 2.1 Dataset & Dataloader
 A custom PyTorch Dataset was built for EfficientNet-B4, loading each image alongside its two labels (auth_label and transform_label), enabling joint multi-task batching.
 2.2 Multi-Task EfficientNet-B4
@@ -31,6 +33,7 @@ The original ImageNet classification head was removed, and the backbone was repu
 Single-task baselines (Authenticator-only and Transformation-only) were built using the same backbone/code structure as the multi-task model, to ensure fair comparison.
 
 2.4 Multi-Task Training
+Several pretrained architectures, specifically ResNet and EfficientNet, were evaluated before EfficientNet-B4 was selected as the final backbone, as it achieved the highest accuracy in our experiments. The decision to test EfficientNet was supported by Shafiq and Pratap (2026), who evaluated multiple pretrained architectures for real-versus-AI image detection, including ResNet and EfficientNetB5, and found that a fine-tuned EfficientNet model achieved the strongest performance. In our model, the original EfficientNet-B4 classification layer was removed, allowing the network to act as a shared feature extractor. Two task-specific output heads were then added on top of this backbone: one for authenticity classification and one for transformation classification, resulting in a multi-task learning model.
 
 Full end-to-end fine-tuning (not just the new heads), justified by Yosinski et al. (2014)'s finding that deep features become increasingly task-specific in later layers — ImageNet features alone are insufficient for detecting generation/transformation artifacts.
 Initial setup: equal loss weights (1.0 / 1.0), Adam optimizer, learning rate 0.0001 (best of tested values), cosine annealing scheduler, weight decay 1e-4.
@@ -38,7 +41,7 @@ Checkpointing: best model saved based on combined validation accuracy (not just 
 15 epochs per model, chosen as a compromise given Colab limits (~8 epochs per session → 2 sessions per run), enabling all 5 loss-weight configurations to be trained within scope.
 Training function supports both training from scratch and resuming from checkpoints.
 
-3. Ablation Study — Loss Weight Configurations
+## Ablation Study — Loss Weight Configurations
 AUTH_LOSS_WEIGHTTRANS_LOSS_WEIGHTPurpose1.01.0Baseline multitask model0.251.0Reduce importance of real/fake task0.11.0Strongly reduce real/fake task1.00.25Reduce importance of transformation task1.00.1Strongly reduce transformation task
 Only loss weights were varied across runs; all other hyperparameters held constant for isolated comparison.
 
